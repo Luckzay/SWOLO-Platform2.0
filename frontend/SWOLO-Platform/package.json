@@ -1,0 +1,64 @@
+{
+  "name": "swolo-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p build-only",
+    "preview": "vite preview",
+    "test:unit": "vitest",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "electron:build": "npm run build && electron-builder --dir",
+    "electron:dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@types/echarts": "^4.9.22",
+    "cross-env": "^7.0.3",
+    "echarts": "^6.0.0",
+    "node-fetch": "^3.3.2",
+    "vue": "^3.5.12"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/test-utils": "^2.4.6",
+    "electron": "^32.1.0",
+    "electron-builder": "^24.13.3",
+    "npm-run-all2": "^6.2.3",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.8",
+    "vite-plugin-vue-devtools": "^7.5.2",
+    "vitest": "^2.1.2",
+    "vue-tsc": "^2.0.22"
+  },
+  "main": "electron-main.cjs",
+  "build": {
+    "appId": "com.swolo.platform",
+    "productName": "SWOLO-Platform",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron-main.cjs",
+      "preload.cjs",
+      "public/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "public"
+    }
+  }
+}

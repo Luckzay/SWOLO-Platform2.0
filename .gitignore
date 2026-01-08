@@ -1,0 +1,198 @@
+# 依赖目录
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# 编译产物
+build/
+dist/
+*.egg-info/
+*.egg
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Electron构建产物
+frontend/SWOLO-Platform/dist-electron/
+frontend/SWOLO-Platform/release/
+frontend/SWOLO-Platform/out/
+
+# Electron打包临时文件
+frontend/SWOLO-Platform/electron-builder/
+frontend/SWOLO-Platform/builder-effective-config.yaml
+frontend/SWOLO-Platform/builder-debug.yml
+
+# Vite构建产物
+frontend/SWOLO-Platform/dist/
+
+# TypeScript编译产物
+frontend/SWOLO-Platform/lib/
+frontend/SWOLO-Platform/es/
+frontend/SWOLO-Platform/umd/
+
+# 测试相关
+coverage/
+.nyc_output/
+*.lcov
+*.orig
+*.rej
+*.bak
+
+# 操作系统相关
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+iTunes Music Library.xml
+Icon?
+VolumeIcon.icns
+.FBCIndex
+.gitattributes
+*.cab
+*.msi
+*.tar*
+*.zip*
+
+# Python特定
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+*.pot
+*.pyc
+.pyo
+py.typed
+Celerybeat-schedule
+*.sage.py
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+.pytest_cache/
+.hypothesis/
+
+# Node.js
+node_modules/
+jspm_packages/
+web_modules/
+*.js.map
+*.mjs.map
+*.cjs.map
+*.tsbuildinfo
+.npm
+node_modules/
+jspm_packages/
+web_modules/
+.npmrc
+.eslintcache
+
+# 临时文件
+.temp/
+tmp/
+_temp/
+*.tmp
+*.bak
+*.old
+*.orig
+*~
+.#*
+*#
+*.save
+*.backup
+.htaccess
+.htpasswd
+
+# 模型文件 - 非常重要，防止上传大模型文件
+yolo_prediction_service/model_data/*.pth
+yolo_prediction_service/model_data/*.pt
+yolo_prediction_service/model_data/*.onnx
+yolo_prediction_service/model_data/*.pb
+yolo_prediction_service/model_data/*.weights
+yolo_prediction_service/model_data/*.ckpt
+yolo_prediction_service/model_data/*.h5
+yolo_prediction_service/model_data/*.safetensors
+
+# 训练输出
+runs/
+weights/
+results.txt
+results.csv
+train/*.jpg
+train/*.png
+val/*.jpg
+val/*.png
+test/*.jpg
+test/*.png
+
+# 个人配置文件
+config.json
+settings.json
+*.local
+*.local.json
+
+# Electron相关临时文件
+frontend/SWOLO-Platform/*.cjs
+frontend/SWOLO-Platform/*.js
+frontend/SWOLO-Platform/*.map
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# 输出文件
+*.out
+*.exe
+*.dll
+*.class
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+*.plist
+
+# 备份文件
+*~
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
