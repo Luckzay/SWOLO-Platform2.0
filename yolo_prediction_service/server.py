@@ -3,10 +3,8 @@ from flask_cors import CORS
 from PIL import Image
 from io import BytesIO
 import base64
-import torch
 import os
 from yolo_service import YOLOService
-import numpy as np
 
 # 创建Flask应用，并设置上传文件大小限制
 app = Flask(__name__)

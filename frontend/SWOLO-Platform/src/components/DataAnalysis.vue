@@ -9,7 +9,25 @@
         <option value="statistic">统计分析</option>
         <option value="report">生成报告</option>
       </select>
+      <button @click="fetchBackendStats" :disabled="loadingStats">刷新统计</button>
     </div>
+
+    <!-- 统计概览 -->
+    <div class="stats-overview" v-if="backendStats && backendStats.totalUsers !== undefined">
+      <div class="stat-card">
+        <h4>总用户数</h4>
+        <p>{{ backendStats.totalUsers || 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h4>总实验数</h4>
+        <p>{{ backendStats.overallExperimentStats?.totalDataPoints || 0 }}</p>
+      </div>
+      <div class="stat-card">
+        <h4>平均浓度</h4>
+        <p>{{ (backendStats.overallExperimentStats?.averageConcentration !== undefined) ? Number(backendStats.overallExperimentStats.averageConcentration).toFixed(2) : 0 }}</p>
+      </div>
+    </div>
+
     <div class="analysis-content">
       <div class="chart-container">
         <canvas id="analysis-chart" ref="chartCanvasRef"></canvas>
@@ -35,7 +53,12 @@
         </table>
       </div>
     </div>
-    
+
+    <!-- 加载指示器 -->
+    <div v-if="loadingStats" class="loading-stats">
+      正在加载统计数据...
+    </div>
+
     <!-- 模型管理区域 -->
     <ModelManager moduleType="data-analysis" />
   </div>
@@ -44,6 +67,8 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import ModelManager from './ModelManager.vue';
+import { getComprehensiveStats } from '../services/apiService';
+import { isAuthenticated } from '../services/authService';
 
 // 响应式数据
 const analysisType = ref<string>('chart');
@@ -55,6 +80,8 @@ const mockData = ref([
   { id: 'EXP004', type: '滴定实验', time: '2023-05-04 16:20', result: '失败' },
   { id: 'EXP005', type: '浓度检测', time: '2023-05-05 11:10', result: '成功' }
 ]);
+const backendStats = ref<any>(null);
+const loadingStats = ref(false);
 
 // 导入数据
 const importData = () => {
@@ -68,45 +95,103 @@ const exportData = () => {
   // 这里应该实现数据导出逻辑
 };
 
+// 从后端获取统计数据
+const fetchBackendStats = async () => {
+  // 检查用户是否已认证
+  if (!isAuthenticated()) {
+    console.warn('用户未认证，无法获取统计数据');
+    backendStats.value = null;
+    loadingStats.value = false;
+    return;
+  }
+
+  loadingStats.value = true;
+  try {
+    const stats = await getComprehensiveStats();
+    backendStats.value = stats;
+  } catch (error) {
+    console.error('获取统计数据失败:', error);
+    // 不再弹窗提醒，避免未登录时频繁弹窗
+    if (error.message.includes('401') || error.message.includes('403')) {
+      console.warn('认证失败，无法获取统计数据');
+    } else {
+      alert('获取统计数据失败，请检查后端连接');
+    }
+  } finally {
+    loadingStats.value = false;
+  }
+};
+
 // 绘制图表
 const drawChart = () => {
   if (!chartCanvasRef.value) return;
-  
+
   const canvas = chartCanvasRef.value;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  
+
   // 设置画布尺寸
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
-  
+
   // 清除画布
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
   // 绘制图表标题
   ctx.font = '16px Arial';
   ctx.fillStyle = '#e6f0ff'; // 使用CSS变量的值
   ctx.textAlign = 'center';
   ctx.fillText('实验数据分析图表', canvas.width / 2, 30);
-  
-  // 绘制简单的柱状图示例
-  const data = [12, 19, 3, 5, 2, 3]; // 示例数据
-  const barWidth = (canvas.width - 100) / data.length;
-  const maxValue = Math.max(...data) || 1; // 避免除零
-  
-  ctx.fillStyle = '#007bff';
-  for (let i = 0; i < data.length; i++) {
-    const barHeight = (data[i] / maxValue) * (canvas.height - 100);
-    const x = 50 + i * barWidth + 10;
-    const y = canvas.height - 50 - barHeight;
-    
-    ctx.fillRect(x, y, barWidth - 20, barHeight);
-    
-    // 添加数值标签
-    ctx.fillStyle = '#e6f0ff'; // 使用CSS变量的值
-    ctx.textAlign = 'center';
-    ctx.fillText(data[i].toString(), x + (barWidth - 20) / 2, y - 10);
+
+  // 如果有后端统计数据，使用真实数据绘制图表
+  if (backendStats.value && backendStats.value.overallExperimentStats) {
+    // 绘制简单的柱状图示例
+    const totalUsers = backendStats.value.totalUsers || 0;
+    const totalDataPoints = backendStats.value.overallExperimentStats.totalDataPoints || 0;
+    const averageConcentration = Number((backendStats.value.overallExperimentStats.averageConcentration || 0).toFixed(2));
+
+    const data = [totalUsers, totalDataPoints, averageConcentration]; // [用户数, 数据点数, 平均浓度]
+    const labels = ['用户数', '数据点', '平均浓度'];
+    const barWidth = (canvas.width - 100) / data.length;
+    const maxValue = Math.max(...data.map(Math.abs), 10) || 10; // 避免除零，使用绝对值
+
     ctx.fillStyle = '#007bff';
+    for (let i = 0; i < data.length; i++) {
+      const barHeight = (Math.abs(data[i]) / maxValue) * (canvas.height - 100); // 使用绝对值计算高度
+      const x = 50 + i * barWidth + 10;
+      const y = canvas.height - 50 - barHeight;
+
+      ctx.fillRect(x, y, barWidth - 20, barHeight);
+
+      // 添加数值标签
+      ctx.fillStyle = '#e6f0ff'; // 使用CSS变量的值
+      ctx.textAlign = 'center';
+      ctx.fillText(data[i].toString(), x + (barWidth - 20) / 2, y - 10);
+
+      // 添加标签
+      ctx.fillText(labels[i], x + (barWidth - 20) / 2, canvas.height - 30);
+      ctx.fillStyle = '#007bff';
+    }
+  } else {
+    // 绘制示例数据
+    const data = [12, 19, 3, 5, 2, 3]; // 示例数据
+    const barWidth = (canvas.width - 100) / data.length;
+    const maxValue = Math.max(...data) || 1; // 避免除零
+
+    ctx.fillStyle = '#007bff';
+    for (let i = 0; i < data.length; i++) {
+      const barHeight = (data[i] / maxValue) * (canvas.height - 100);
+      const x = 50 + i * barWidth + 10;
+      const y = canvas.height - 50 - barHeight;
+
+      ctx.fillRect(x, y, barWidth - 20, barHeight);
+
+      // 添加数值标签
+      ctx.fillStyle = '#e6f0ff'; // 使用CSS变量的值
+      ctx.textAlign = 'center';
+      ctx.fillText(data[i].toString(), x + (barWidth - 20) / 2, y - 10);
+      ctx.fillStyle = '#007bff';
+    }
   }
 };
 
@@ -114,6 +199,9 @@ const drawChart = () => {
 onMounted(async () => {
   await nextTick();
   drawChart();
+
+  // 尝试获取后端统计数据
+  await fetchBackendStats();
 });
 </script>
 
@@ -169,11 +257,55 @@ onMounted(async () => {
   transform: translateY(-2px);
 }
 
+.data-controls button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .data-controls select {
   min-width: 180px;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
+}
+
+.stats-overview {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 150px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--glow);
+}
+
+.stat-card h4 {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.stat-card p {
+  color: var(--secondary-color);
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
 }
 
 .analysis-content {
@@ -312,5 +444,12 @@ onMounted(async () => {
 .model-controls button:hover {
   background: var(--primary-gradient);
   box-shadow: var(--glow);
+}
+
+.loading-stats {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 </style>

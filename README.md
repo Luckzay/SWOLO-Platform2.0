@@ -1,121 +1,116 @@
-igno# SWOLO-Platform 2.0
+# SWOLO-Platform2.0
 
-SWOLO-Platform 2.0 是一个基于人工智能技术的化学实验智能平台，结合了YOLO目标检测算法与现代化桌面应用框架，用于化学实验过程中的自动化分析与检测。
-
-## 项目概述
-
-本项目主要分为两个核心部分：
-
-1. **前端界面 (Frontend)** - 基于 Vue 3 和 Electron 构建的现代化桌面应用程序
-2. **YOLO预测服务 (Prediction Service)** - 基于YOLOv5/v8的目标检测模型，用于化学实验图像分析
-
-## 核心功能
-
-- **滴定实验分析** - 自动识别滴定过程中的颜色变化、终点判断、体积和浓度检测
-- **浓度检测** - 通过图像分析技术精确测量溶液浓度
-- **智能表征** - 化学物质的自动识别与特征分析
-- **数据分析** - 实验数据记录、可视化和统计分析
-
-## 技术栈
-
-### 前端技术
-- **Vue 3** - 响应式前端框架
-- **TypeScript** - 类型安全的JavaScript超集
-- **Electron** - 桌面应用框架
-- **Vite** - 现代化构建工具
-- **Tailwind CSS** - 样式框架
-
-### AI/ML 技术
-- **PyTorch** - 深度学习框架
-- **YOLOv5/YOLOv8** - 目标检测算法
-- **Flask** - Python Web框架用于API服务
+现代化科学实验分析平台，结合了前端界面、后端服务和YOLO预测服务，提供完整的实验数据处理和分析解决方案。
 
 ## 项目结构
 
-```
-SWOLO-Platform2.0/
-├── frontend/
-│   └── SWOLO-Platform/           # Electron桌面应用
-│       ├── src/
-│       │   ├── components/       # Vue组件
-│       │   ├── services/         # API服务
-│       │   └── router/           # 路由配置
-│       ├── public/               # 静态资源
-│       ├── electron-main.ts      # Electron主进程
-│       └── preload.ts            # 预加载脚本
-└── yolo_prediction_service/      # YOLO预测服务
-    ├── nets/                     # YOLOv5网络结构
-    ├── netsv8/                   # YOLOv8网络结构
-    ├── utils/                    # 工具函数
-    ├── utilsv8/                  # YOLOv8工具函数
-    ├── model_data/               # 模型数据文件
-    ├── server.py                 # Flask API服务
-    ├── yolo_service.py           # YOLO服务封装
-    └── requirements.txt          # Python依赖
-```
+- `frontend/SWOLO-Platform`: 基于Vue.js的前端应用，提供现代化科技感界面
+- `backend`: 基于Spring Boot的后端服务，使用MySQL数据库
+- `yolo_prediction_service`: YOLO目标检测和浓度预测服务
+
+## 功能特性
+
+### 前端 (Vue.js)
+- 现代化科技感界面设计
+- 实验数据可视化
+- 用户友好的交互体验
+- 响应式布局
+
+### 后端 (Spring Boot)
+- 完整的用户管理系统
+- 基于JWT的身份验证
+- 实验数据管理API
+- 支持多种实验数据类型：
+  - 目标检测数据
+  - 浓度测量数据
+  - 通用实验数据
+- RESTful API设计
+
+### YOLO预测服务 (Python)
+- 目标检测功能
+- 浓度预测功能
+- 基于深度学习的图像分析
+- 高精度预测算法
+
+## 技术栈
+
+### 前端
+- Vue.js 3
+- TypeScript
+- Vite
+- CSS
+
+### 后端
+- Java 17
+- Spring Boot 3.2.0
+- Spring Security
+- Spring Data JPA
+- MySQL
+- JWT
+
+### 预测服务
+- Python
+- PyTorch
+- YOLO算法
+- OpenCV
 
 ## 快速开始
 
-### 环境要求
+### 后端服务设置
 
-- Node.js >= 16.0.0
-- Python >= 3.7
-- npm 或 yarn
+1. 确保已安装Java 17和Maven
+2. 安装并启动MySQL服务
+3. 创建数据库：
+   ```sql
+   CREATE DATABASE swole_platform CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+4. 进入后端目录并运行：
+   ```bash
+   cd backend
+   mvn spring-boot:run
+   ```
+   或在IDE中运行[PlatformApplication.java](file:///F:/SWOLO-Platform2.0/backend/src/main/java/com/swole/platform/PlatformApplication.java)
 
-### 前端启动
+### 前端设置
 
-```bash
-# 进入前端目录
-cd frontend/SWOLO-Platform
+1. 确保已安装Node.js和npm
+2. 进入前端目录：
+   ```bash
+   cd frontend/SWOLO-Platform
+   npm install
+   npm run dev
+   ```
 
-# 安装依赖
-npm install
+### YOLO预测服务设置
 
-# 启动开发服务器
-npm run dev
+1. 确保已安装Python 3.8+
+2. 进入预测服务目录：
+   ```bash
+   cd yolo_prediction_service
+   pip install -r requirements.txt
+   ```
+3. 启动服务：
+   ```bash
+   python server.py
+   ```
 
-# 启动Electron应用
-npm run electron:dev
-```
+## API文档
 
-### YOLO服务启动
+- 后端API文档: [backend/API_DOCUMENTATION.md](file:///F:/SWOLO-Platform2.0/backend/API_DOCUMENTATION.md)
+- YOLO服务API文档: [yolo_prediction_service/API_DOCUMENTATION.md](file:///F:/SWOLO-Platform2.0/yolo_prediction_service/API_DOCUMENTATION.md)
 
-```bash
-# 进入YOLO服务目录
-cd yolo_prediction_service
+## 开发指南
 
-# 安装Python依赖
-pip install -r requirements.txt
+详细开发指南请参见[DEVELOPMENT_GUIDE.md](file:///F:/SWOLO-Platform2.0/DEVELOPMENT_GUIDE.md)。
 
-# 启动服务 (Windows)
-start_server.bat
+## 贡献
 
-# 启动服务 (Linux/Mac)
-./start_server.sh
-```
-
-## 架构说明
-
-### 通信流程
-
-1. Electron前端应用通过HTTP API与YOLO预测服务通信
-2. 图像数据从前端传输到后端进行AI分析
-3. 检测结果返回前端进行显示和处理
-
-### 模型支持
-
-- **MOF模型** - 用于常规化学物质检测
-- **浓度检测模型** - 专门用于浓度分析
-- **GLU模型** - 用于特定化学物质检测(YOLOv8)
-
-## 贡献指南
-
-请参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 获取详细的贡献指南。
+欢迎贡献代码！请遵循以下步骤：
+1. Fork仓库
+2. 创建功能分支
+3. 提交更改
+4. 发起Pull Request
 
 ## 许可证
 
-本项目采用 MIT 许可证 - 详情请参见 [LICENSE](LICENSE) 文件。
-
-## 联系方式
-
-如有任何问题或建议，请联系1617022583@qq.com。
+本项目采用MIT许可证。

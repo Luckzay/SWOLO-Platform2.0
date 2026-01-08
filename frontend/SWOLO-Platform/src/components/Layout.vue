@@ -20,6 +20,17 @@
         >
           检查连接
         </button>
+        <!-- 用户认证状态 -->
+        <div class="user-section">
+          <template v-if="isLoggedIn">
+            <span class="user-info">欢迎, {{ currentUser?.name || currentUser?.employeeId }}</span>
+            <button class="logout-btn" @click="$emit('logout')">登出</button>
+          </template>
+          <template v-else>
+            <button class="login-btn" @click="$emit('showLogin')">登录</button>
+            <button class="register-btn" @click="$emit('showRegister')">注册</button>
+          </template>
+        </div>
       </div>
       <nav class="nav-menu">
         <button 
@@ -69,6 +80,7 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue'
+import { useAuthStore } from '../stores/authStore';
 
 interface Props {
   currentSection: string,
@@ -76,19 +88,30 @@ interface Props {
   serverConnected: boolean
 }
 
+interface Emits {
+  'sectionChange': [section: string],
+  'checkConnection': [],
+  'showLogin': [],
+  'showRegister': [],
+  'logout': []
+}
+
 const props = withDefaults(defineProps<Props>(), {
   serverStatus: '服务器连接: 未连接',
   serverConnected: false
 })
 
-const emit = defineEmits<{
-  'section-change': [section: string],
-  'check-connection': []
-}>()
+const emit = defineEmits<Emits>()
+
+const authStore = useAuthStore();
 
 const changeSection = (section: string) => {
-  emit('section-change', section)
+  emit('sectionChange', section)
 }
+
+// 计算属性
+const isLoggedIn = authStore.isLoggedIn;
+const currentUser = authStore.currentUser;
 </script>
 
 <style scoped>
@@ -177,6 +200,54 @@ const changeSection = (section: string) => {
 
 .status-btn:hover {
   background: var(--primary-gradient);
+  box-shadow: var(--glow);
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.login-btn, .register-btn, .logout-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid rgba(0, 102, 204, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn::before, .register-btn::before, .logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 102, 204, 0.2), transparent);
+  transition: var(--transition);
+}
+
+.login-btn:hover::before, .register-btn:hover::before, .logout-btn:hover::before {
+  left: 100%;
+}
+
+.login-btn:hover, .register-btn:hover, .logout-btn:hover {
+  background: rgba(0, 102, 204, 0.2);
+  color: white;
+  border-color: var(--primary-color);
   box-shadow: var(--glow);
 }
 

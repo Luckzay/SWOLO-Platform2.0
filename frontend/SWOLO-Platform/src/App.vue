@@ -6,11 +6,19 @@ import Titration from './components/Titration.vue'
 import Concentration from './components/Concentration.vue'
 import Characterization from './components/Characterization.vue'
 import DataAnalysis from './components/DataAnalysis.vue'
+import Login from './components/Login.vue'
+import Register from './components/Register.vue'
 import { checkServerConnection } from './services/apiService'
+import { useAuthStore } from './stores/authStore'
 
 const currentSection = ref('dashboard')
 const serverStatus = ref('服务器连接: 未连接')
 const serverConnected = ref(false)
+const showLoginModal = ref(false)
+const showRegisterModal = ref(false)
+
+// 使用认证store
+const authStore = useAuthStore()
 
 // 检查服务器连接状态
 const checkServerStatus = async () => {
@@ -24,30 +32,90 @@ const navigateToModule = (module: string) => {
   currentSection.value = module
 }
 
+// 显示登录模态框
+const showLogin = () => {
+  showLoginModal.value = true
+}
+
+// 显示注册模态框
+const showRegister = () => {
+  showRegisterModal.value = true
+}
+
+// 关闭模态框
+const closeModals = () => {
+  showLoginModal.value = false
+  showRegisterModal.value = false
+}
+
+// 处理登出
+const handleLogout = () => {
+  authStore.logout()
+}
+
 onMounted(() => {
   // 初始化时检查服务器状态
   checkServerStatus()
+
+  // 检查认证状态
+  authStore.checkAuthStatus()
 })
 </script>
 
 <template>
-  <Layout 
-    :current-section="currentSection" 
+  <Layout
+    :current-section="currentSection"
     :server-status="serverStatus"
     :server-connected="serverConnected"
     @section-change="currentSection = $event"
     @check-connection="checkServerStatus"
+    @show-login="showLogin"
+    @show-register="showRegister"
+    @logout="handleLogout"
   >
-    <Dashboard 
+    <Dashboard
       v-if="currentSection === 'dashboard'"
       @navigate-to-module="navigateToModule"
     />
-    
+
     <Titration v-if="currentSection === 'titration'" />
     <Concentration v-if="currentSection === 'concentration'" />
     <Characterization v-if="currentSection === 'characterization'" />
     <DataAnalysis v-if="currentSection === 'data-analysis'" />
   </Layout>
+
+  <!-- 登录模态框 -->
+  <Teleport to="body">
+    <Login
+      v-if="showLoginModal"
+      @switch-to-register="() => {
+        showLoginModal.value = false
+        showRegisterModal.value = true
+      }"
+      @close="closeModals"
+    />
+  </Teleport>
+
+  <!-- 注册模态框 -->
+  <Teleport to="body">
+    <Register
+      v-if="showRegisterModal"
+      @switch-to-login="() => {
+        showRegisterModal.value = false
+        showLoginModal.value = true
+      }"
+      @close="closeModals"
+    />
+  </Teleport>
+
+  <!-- 背景遮罩 -->
+  <Teleport to="body">
+    <div
+      v-if="showLoginModal || showRegisterModal"
+      class="modal-overlay"
+      @click="closeModals"
+    ></div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -476,5 +544,15 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 1rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
 }
 </style>

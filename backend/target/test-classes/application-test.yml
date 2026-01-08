@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      h2:
+        dialect: org.hibernate.dialect.H2Dialect
+
+jwt:
+  secret: testsecretforunittestingwhichislongenoughtomeetsecurityrequirements
+  expiration: 86400000
+
+logging:
+  level:
+    com.swole.platform: DEBUG
+    org.springframework.security: DEBUG

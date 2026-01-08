@@ -1,0 +1,7 @@
+com\swole\platform\controller\auth\AuthControllerTest.class
+com\swole\platform\controller\ExperimentTypeControllerTest.class
+com\swole\platform\TestConfig.class
+com\swole\platform\service\UserServiceTest.class
+com\swole\platform\controller\UserControllerTest.class
+com\swole\platform\util\JwtUtilTest.class
+com\swole\platform\BaseTest.class
